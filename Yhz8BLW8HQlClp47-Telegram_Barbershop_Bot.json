@@ -1,0 +1,470 @@
+{
+  "name": "Telegram Barbershop Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "baa725fb-6be2-4a8d-832f-62cca02522cb",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        192
+      ],
+      "webhookId": "d768e1e6-3823-40ed-9945-1c45016737d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "aa6RMR05oQKURrtr",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "Você é um assistente de barbearia focado em agendamento. Siga RIGOROSAMENTE estas etapas:\n\nETAPA 1 - NOME:\n- Pergunte o nome do cliente\n- Assim que receber o nome, CHAME IMEDIATAMENTE a ferramenta Salvar_Nome\n- Após salvar, confirme e passe para a próxima etapa\n\nETAPA 2 - SERVIÇO:\n- Pergunte qual serviço deseja (corte, barba, etc)\n- Assim que receber o serviço, CHAME IMEDIATAMENTE a ferramenta Salvar_Servico\n- Após salvar, confirme e passe para a próxima etapa\n\nETAPA 3 - DIA:\n- CHAME a ferramenta Consultar_Disponibilidade para ver datas disponíveis\n- Mostre as opções reais ao cliente\n- Aguarde a escolha do cliente\n\nETAPA 4 - HORÁRIO:\n- CHAME a ferramenta Consultar_Disponibilidade para ver horários disponíveis no dia escolhido\n- Mostre as opções reais ao cliente\n- Aguarde a escolha do cliente\n\nETAPA 5 - CONFIRMAÇÃO FINAL:\n- Resuma TODOS os dados: Nome, Serviço, Dia e Horário\n- Peça confirmação final\n- SOMENTE após confirmação, CHAME a ferramenta Confirmar_Agendamento\n- Mostre mensagem de sucesso com resumo completo\n\nREGRAS OBRIGATÓRIAS:\n- NUNCA invente dados\n- SEMPRE chame as ferramentas nos momentos indicados\n- SEMPRE aguarde confirmação antes de avançar etapas\n- Mantenha tom amigável e profissional"
+        }
+      },
+      "id": "5195a644-b339-4782-bb97-eae8c938243d",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        720,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "id": "ffbe7597-5783-40d2-8571-81c045e17c8e",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        592,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4",
+          "mode": "list",
+          "cachedResultName": "RELATÓRIO DE CURADORIA DE MENSAGENS Programa barbearia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome:": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', 'Nome do cliente') }}",
+            "data:": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data', 'Data do agendamento') }}",
+            "horario:": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('horario', 'Horário do agendamento') }}"
+          },
+          "matchingColumns": [
+            "nome:"
+          ],
+          "schema": [
+            {
+              "id": "nome:",
+              "displayName": "nome:",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data:",
+              "displayName": "data:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "horario:",
+              "displayName": "horario:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "serviço:",
+              "displayName": "serviço:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4a4cc66b-e8d7-4f5c-8118-f6f379009f7b",
+      "name": "Confirmar_Agendamento",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Dk5F6kolPB7qgNtB",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b5c60c5d-7791-42fa-81d6-cb78f800c791",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        192
+      ],
+      "webhookId": "77e624e1-f5f7-44e7-9737-48ea308803cd",
+      "credentials": {
+        "telegramApi": {
+          "id": "aa6RMR05oQKURrtr",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "8cf872f7-4914-43f3-8527-53f86f265320",
+      "name": "Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        416
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "phhweNRa46YInprQ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4",
+          "mode": "list",
+          "cachedResultName": "RELATÓRIO DE CURADORIA DE MENSAGENS Programa barbearia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome:": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', 'Nome completo do cliente') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "nome:",
+              "displayName": "nome:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data:",
+              "displayName": "data:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "horario:",
+              "displayName": "horario:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "serviço:",
+              "displayName": "serviço:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "c91032c1-ea88-4c46-84a4-25eabb707a4c",
+      "name": "Salvar_Nome",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Dk5F6kolPB7qgNtB",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4",
+          "mode": "list",
+          "cachedResultName": "RELATÓRIO DE CURADORIA DE MENSAGENS Programa barbearia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome:": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', 'Nome do cliente') }}",
+            "serviço:": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servico', 'Tipo de serviço escolhido') }}"
+          },
+          "matchingColumns": [
+            "nome:"
+          ],
+          "schema": [
+            {
+              "id": "nome:",
+              "displayName": "nome:",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data:",
+              "displayName": "data:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "horario:",
+              "displayName": "horario:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "serviço:",
+              "displayName": "serviço:",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "eb158bcd-454b-4124-a7cb-080782a20b91",
+      "name": "Salvar_Servico",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1104,
+        416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Dk5F6kolPB7qgNtB",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "documentId": {
+          "__rl": true,
+          "value": "1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4",
+          "mode": "list",
+          "cachedResultName": "RELATÓRIO DE CURADORIA DE MENSAGENS Programa barbearia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LF1_smmsYEEVVqtIyaoEvDz8LSLx6DbJyMNnEGaNOy4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "14a4d867-6d53-4a00-b914-f03ea25610b1",
+      "name": "Consultar_Disponibilidade",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        720,
+        416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Dk5F6kolPB7qgNtB",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmar_Agendamento": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salvar_Nome": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Salvar_Servico": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Consultar_Disponibilidade": {
+      "ai_tool": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
