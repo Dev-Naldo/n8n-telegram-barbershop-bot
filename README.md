@@ -7,7 +7,7 @@ Um bot de atendimento automatizado para o Telegram, projetado para atuar como as
 ---
 
 ## 🎥 Demonstração
-![Demonstração do Bot](https://drive.google.com/file/d/1xP_gsnmMgV6loEGh1L37wdqM1BE31u7t/view?usp=sharing)
+[Demonstração do Bot](https://drive.google.com/file/d/1xP_gsnmMgV6loEGh1L37wdqM1BE31u7t/view?usp=sharing)
 
 ---
 
